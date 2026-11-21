@@ -1,0 +1,7 @@
+[sshd]
+enabled = true
+backend = polling
+logpath = /var/log/auth.log
+maxretry = 2
+findtime = 600
+bantime = 600
