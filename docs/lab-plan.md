@@ -11,3 +11,4 @@
 - SSH: OpenSSH server enabled on port 22/tcp
 - UFW: Active with OpenSSH allowed and default incoming traffic denied
 - Fail2Ban: Active with sshd jail enabled
+- Validation: Verified journald fields (SYSLOG_IDENTIFIER=sshd, _COMM=sshd, _SYSTEMD_UNIT=ssh.service) and tested Fail2Ban detection against SSH login attempts on 127.0.0.1.
