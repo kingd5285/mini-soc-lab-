@@ -1,0 +1,6 @@
+.vdi
+.vmdk
+*.ova
+*.env
+*id_rsa*
+*id_ed25519*
