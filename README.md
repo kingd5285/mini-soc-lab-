@@ -11,12 +11,15 @@ A small Blue Team lab built on Kali Linux under WSL to practice host firewalling
 - **Safe testing:** loopback kept in `ignoreip` by default, temporarily removed only to prove a live ban, then restored.
 - **Automation:** scripts that check lab health (PASS/FAIL) and summarize attacks.
 
-## Architecture
-- **Environment:** WARMACHINE (Kali Linux on WSL)
-- **Firewall:** UFW (default deny incoming)
-- **IPS:** Fail2Ban (`sshd` jail, `/var/log/auth.log`)
-- **Log ingestion:** rsyslog
-- **Attack simulation:** Hydra against 127.0.0.1 (lab only)
+## Environment & Architecture
+- **Host OS:** Windows 11
+- **Linux environment:** Kali Linux WSL (`WARMACHINE`)
+- **Target:** Local SSH service (`127.0.0.1`, port 22)
+- **Testing scope:** Localhost only (`127.0.0.1`)
+- **Firewall:** UFW (default deny incoming, SSH allowed)
+- **Log source:** `/var/log/auth.log` (via `rsyslog`)
+- **IPS:** Fail2Ban (`sshd` jail, `backend = polling`, monitoring `/var/log/auth.log`)
+- **Attack simulation:** Hydra against `127.0.0.1` (lab only)
 
 ## Prerequisites
 
@@ -24,10 +27,11 @@ A small Blue Team lab built on Kali Linux under WSL to practice host firewalling
     sudo apt install -y ufw fail2ban rsyslog openssh-server hydra nmap shellcheck
 
 ## Repository Structure
-- `configs/` - reference configuration snapshots (`sshd-wsl.local`)
-- `docs/` - lab plan, roadmap, and notes (`lab-plan.md`)
+- `configs/` - reference configuration snapshots (`sshd-wsl.local`, `ufw-policy.md`)
+- `docs/` - lab plan, architecture, testing results, limitations, and notes (`lab-plan.md`, `architecture.md`, `testing-results.md`, `limitations.md`)
 - `scripts/` - `health-check.sh`, `log-summary.sh`, `recon-check.sh`
-- `screenshots/` - evidence from lab runs
+- `screenshots/` - evidence from lab runs (`health-check-pass.png`, `log-summary-output.png`, `firewall-status.png`)
+- `reports/` - final lab summary (`mini-soc-final-report.md`)
 
 ## Running the Scripts
 
@@ -48,6 +52,7 @@ A small Blue Team lab built on Kali Linux under WSL to practice host firewalling
 
 ![Health check](screenshots/health-check-pass.png)
 ![Log summary](screenshots/log-summary-output.png)
+![Firewall status](screenshots/firewall-status.png)
 
 ## Script Design Notes
 - `log-summary.sh` excludes `sudo` self-logging lines so its own commands are not counted as attacks.
