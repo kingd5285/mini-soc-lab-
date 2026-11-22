@@ -4,7 +4,7 @@ AUTH_LOG="${1:-/var/log/auth.log}"
 F2B_LOG="/var/log/fail2ban.log"
 
 [ -f "$AUTH_LOG" ] || { echo "Log file not found: $AUTH_LOG"; exit 1; }
-FAILED=$(sudo grep "Failed password" "$AUTH_LOG")
+FAILED=$(sudo grep -a "Failed password" "$AUTH_LOG" | grep -v " sudo:")
 
 echo "=== Mini-SOC SSH Auth Log Summary ($(hostname)) ==="
 echo "[1] Failed SSH attempts:"
@@ -21,7 +21,7 @@ printf '%s' "$FAILED" \
 
 echo; echo "[4] Recent Fail2Ban Ban/Unban events:"
 if [ -f "$F2B_LOG" ]; then
-  sudo grep -E '\] (Ban|Unban) ' "$F2B_LOG" | tail -n 5
+  sudo grep -aE '\] (Ban|Unban) ' "$F2B_LOG" | tail -n 5
 else
   echo "No $F2B_LOG found"
 fi
