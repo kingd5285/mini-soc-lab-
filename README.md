@@ -60,10 +60,18 @@ A small Blue Team lab built on Kali Linux under WSL to practice host firewalling
     sudo service rsyslog status
     sudo fail2ban-client status sshd
 
-## Findings
-- Hydra generated 6 failed SSH attempts from 127.0.0.1 (MITRE ATT&CK T1110 - Brute Force).
-- Fail2Ban ban/unban verified using documentation test IP 192.0.2.50.
-- Health check: all 6 checks PASS (UFW active, default deny, rsyslog, auth.log, sshd jail, loopback in effective ignoreip).
+## Findings & Testing Results
+- Hydra generated 6 failed SSH attempts from `127.0.0.1` (`MITRE ATT&CK T1110` - Brute Force).
+- Fail2Ban ban/unban verified using documentation test IP `192.0.2.50` while preserving `[DEFAULT]` `ignoreip` safety for loopback.
+
+| Test | Expected Result | Actual Result | Status |
+| :--- | :--- | :--- | :--- |
+| UFW status | Active | Active | PASS |
+| Default incoming | Deny | Deny | PASS |
+| rsyslog | Running | Running | PASS |
+| SSH jail | Active | Active | PASS |
+| Authentication logs | Available | Available | PASS |
+| Health check | All checks pass | 6 checks passed | PASS |
 
 ![Health check](screenshots/health-check-pass.png)
 ![Log summary](screenshots/log-summary-output.png)
