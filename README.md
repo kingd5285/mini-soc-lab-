@@ -2,9 +2,15 @@
 
 A modular Blue Team and detection engineering lab built on Kali Linux under WSL to practice host firewalling, authentication log ingestion, intrusion prevention validation, and clear security documentation for portfolio development.
 
+## What This Lab Demonstrates
+- **Host Firewalling:** Enforcing default incoming deny rules using `UFW` on a Kali Linux WSL environment (`WARMACHINE`).
+- **WSL Log Ingestion:** Running `rsyslog` so authentication events are reliably written to `/var/log/auth.log` for `Fail2Ban` `polling` mode.
+- **Detection & Enforcement:** Validating `sshd` filter rules via `fail2ban-regex` and verifying active jail actions (`banip` / `unbanip`) with `fail2ban-client`.
+- **Loopback (`ignoreip`) Precedence:** Documenting how `[DEFAULT]` `ignoreip = 127.0.0.1/8 ::1` prevents loopback auto-bans during local `Hydra` tests while keeping loopback exclusions intact to protect host access.
+
 ## Architecture & Stack
 - **Environment:** `WARMACHINE` (Kali Linux on WSL)
-- **Host Firewall:** `UFW` (configured with default incoming deny)
+- **Host Firewall:** `UFW` (default incoming deny)
 - **Intrusion Prevention:** `Fail2Ban` (`sshd` jail using `backend = polling` and `/var/log/auth.log`)
 - **Log Ingestion:** `rsyslog` (forwarding authentication events to `/var/log/auth.log`)
 - **Simulated Attack Testing:** `Hydra` (controlled local SSH authentication attempts)
@@ -12,12 +18,13 @@ A modular Blue Team and detection engineering lab built on Kali Linux under WSL 
 ## Repository Structure
 - `configs/` — Reference configuration snapshots (`sshd-wsl.local`)
 - `docs/` — Lab planning notes, detection findings, and architecture documentation (`lab-plan.md`)
-- `scripts/` — Automation and security posture health-check scripts
+- `scripts/` — Automation and security posture scripts (`health-check.sh`, `log-summary.sh`, `recon_check.sh`)
+- `screenshots/` — Visual evidence from lab runs
 
-## Key Findings & Validation
-- **WSL Log Ingestion:** Enabled and verified `rsyslog` so `Fail2Ban` reliably polls `/var/log/auth.log` rather than relying solely on direct journal queries.
-- **Filter & Enforcement Testing:** Validated `sshd` filter regex matching against authentication logs with `fail2ban-regex`, and confirmed active jail enforcement using `fail2ban-client` (`banip` and `unbanip`).
-- **Loopback (`ignoreip`) Precedence:** Confirmed that `[DEFAULT]` `ignoreip = 127.0.0.1/8 ::1` prevents automated bans on loopback traffic even when testing against `127.0.0.1`, and preserved loopback exclusions to avoid locking out local access.
+## Running the Lab Scripts
+
+    ./scripts/health-check.sh
+    ./scripts/log-summary.sh
 
 ## Quick Status Checks
 
