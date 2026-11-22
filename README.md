@@ -25,6 +25,7 @@ A modular Blue Team and detection engineering lab built on Kali Linux under WSL 
 
     ./scripts/health-check.sh
     ./scripts/log-summary.sh
+    ./scripts/recon-check.sh 127.0.0.1 22
 
 ## Quick Status Checks
 

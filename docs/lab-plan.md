@@ -2,7 +2,6 @@
 - Attacker: Kali Linux (WSL / WARMACHINE)
 - Target & SOC Components: Ubuntu Server, Wazuh / Suricata, UFW, Fail2Ban
 - Rules of Engagement: Authorized home lab environment only.
-- Status: Credential store enabled
 - Firewall (UFW): Active (22/tcp OpenSSH allowed, default incoming deny)
 - Intrusion Prevention (Fail2Ban): Active with sshd jail enabled
 
@@ -15,3 +14,13 @@
 - Session Wrap-up: Confirmed rsyslog active, verified 127.0.0.1/8 in default Fail2Ban ignoreip, and validated sshd jail ban/unban actions using test IP 192.0.2.50 on WARMACHINE.
 - Live Ban Verification: Temporarily excluded 127.0.0.1 from ignoreip with bantime=60 and maxretry=2; confirmed Hydra triggered automated ban on 127.0.0.1, then restored 127.0.0.1/8 to ignoreip.
 - Loopback Architecture Note: Default [DEFAULT] ignoreip=127.0.0.1/8 supersedes jail-level ignoreip overrides; validated detection via fail2ban-regex and enforcement via fail2ban-client banip/unbanip while preserving safe loopback defaults.
+
+## Roadmap (Planned, not yet implemented)
+- Ubuntu Server target
+- Wazuh / Suricata integration
+
+## MITRE ATT&CK Mapping
+- T1110 Brute Force (SSH, tested with Hydra on loopback)
+
+## Limitations
+- WSL is not a production server; ban enforcement may differ from bare metal.

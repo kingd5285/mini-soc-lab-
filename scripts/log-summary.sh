@@ -1,25 +1,27 @@
 #!/usr/bin/env bash
-set -u
+set -uo pipefail
+AUTH_LOG="${1:-/var/log/auth.log}"
+F2B_LOG="/var/log/fail2ban.log"
 
-LOG_FILE="/var/log/auth.log"
+[ -f "$AUTH_LOG" ] || { echo "Log file not found: $AUTH_LOG"; exit 1; }
+FAILED=$(sudo grep "Failed password" "$AUTH_LOG")
 
-echo "=== Mini-SOC SSH Auth Log Summary (WARMACHINE) ==="
-if [ ! -f "$LOG_FILE" ]; then
-    echo "Log file not found: $LOG_FILE"
-    exit 1
+echo "=== Mini-SOC SSH Auth Log Summary ($(hostname)) ==="
+echo "[1] Failed SSH attempts:"
+printf '%s' "$FAILED" | grep -c . || true
+
+echo; echo "[2] Top source IPs:"
+printf '%s' "$FAILED" | grep -Eo 'from ([0-9]{1,3}\.){3}[0-9]{1,3}' \
+  | awk '{print $2}' | sort | uniq -c | sort -nr | head -n 5
+
+echo; echo "[3] Top targeted usernames (valid + invalid):"
+printf '%s' "$FAILED" \
+  | sed -E 's/.*Failed password for (invalid user )?([^ ]+) from.*/\2/' \
+  | sort | uniq -c | sort -nr | head -n 5
+
+echo; echo "[4] Recent Fail2Ban Ban/Unban events:"
+if [ -f "$F2B_LOG" ]; then
+  sudo grep -E '\] (Ban|Unban) ' "$F2B_LOG" | tail -n 5
+else
+  echo "No $F2B_LOG found"
 fi
-
-echo "[1] Total Failed / Invalid SSH Events:"
-sudo grep -Ec "Failed password|Invalid user|authentication failure" "$LOG_FILE" || true
-
-echo ""
-echo "[2] Top Source IP Addresses (Failed/Invalid):"
-sudo grep -E "Failed password|Invalid user" "$LOG_FILE" | grep -Eo '([0-9]{1,3}\.){3}[0-9]{1,3}' | sort | uniq -c | sort -nr | head -n 5 || true
-
-echo ""
-echo "[3] Top Targeted Usernames:"
-sudo grep -E "Invalid user" "$LOG_FILE" | awk '{for(i=1;i<=NF;i++) if($i=="user") print $(i+1)}' | sort | uniq -c | sort -nr | head -n 5 || true
-
-echo ""
-echo "[4] Recent 5 Auth Alerts:"
-sudo grep -E "Failed password|Invalid user|Ban|Unban" "$LOG_FILE" | tail -n 5 || true
