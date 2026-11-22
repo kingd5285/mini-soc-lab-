@@ -19,6 +19,7 @@ A small Blue Team lab built on Kali Linux under WSL to practice host firewalling
 - **Attack simulation:** Hydra against 127.0.0.1 (lab only)
 
 ## Prerequisites
+
     sudo apt update
     sudo apt install -y ufw fail2ban rsyslog openssh-server hydra nmap shellcheck
 
@@ -29,11 +30,13 @@ A small Blue Team lab built on Kali Linux under WSL to practice host firewalling
 - `screenshots/` - evidence from lab runs
 
 ## Running the Scripts
+
     ./scripts/health-check.sh              # PASS/FAIL checks, exit code 0 = healthy
     ./scripts/log-summary.sh               # failed attempts, top IPs, usernames, Ban/Unban events
     ./scripts/recon-check.sh 127.0.0.1 22  # open ports vs expected policy
 
 ## Quick Status Checks
+
     sudo ufw status verbose
     sudo service rsyslog status
     sudo fail2ban-client status sshd
