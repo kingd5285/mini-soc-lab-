@@ -1,21 +1,27 @@
-# Mini-SOC & Network Intrusion Detection Lab
+# Mini-SOC / IDS Lab (Kali Linux WSL - WARMACHINE)
 
-## Overview
-A hands-on cybersecurity home lab simulating real-world attack scenarios from *Kali Linux (Red Team)* against a target server, while detecting, analyzing, and mitigating threats using *Wazuh/Suricata and Fail2Ban (Blue Team)*.
+A modular Blue Team and detection engineering lab built on Kali Linux under WSL to practice host firewalling, authentication log ingestion, intrusion prevention validation, and clear security documentation for portfolio development.
 
-## Lab Architecture
-- *Attacker Machine:* Kali Linux (WSL / VM)
-- *Target Server:* Ubuntu Server / DVWA
-- *Monitoring & SIEM:* Ubuntu Server + Wazuh / Suricata
-
-## Project Phases
-1. *Environment & Network Setup:* Isolated lab network configuration.
-2. *Reconnaissance & Exploitation:* Port scanning (nmap), SSH brute-force (hydra), and web enumeration (gobuster).
-3. *Detection & Log Analysis:* Monitoring security alerts and auth logs (/var/log/auth.log).
-4. *Hardening & Remediation:* Implementing ufw, fail2ban, and SSH key-based authentication.
+## Architecture & Stack
+- **Environment:** `WARMACHINE` (Kali Linux on WSL)
+- **Host Firewall:** `UFW` (configured with default incoming deny)
+- **Intrusion Prevention:** `Fail2Ban` (`sshd` jail using `backend = polling` and `/var/log/auth.log`)
+- **Log Ingestion:** `rsyslog` (forwarding authentication events to `/var/log/auth.log`)
+- **Simulated Attack Testing:** `Hydra` (controlled local SSH authentication attempts)
 
 ## Repository Structure
-- docs/ - Network diagrams and incident response reports
-- configs/ - Sanitized firewall (ufw) and fail2ban configurations
-- scripts/ - Automation and log-parsing scripts
-- screenshots/ - Redacted proof-of-concept and SIEM alert captures
+- `configs/` — Reference configuration snapshots (`sshd-wsl.local`)
+- `docs/` — Lab planning notes, detection findings, and architecture documentation (`lab-plan.md`)
+- `scripts/` — Automation and security posture health-check scripts
+
+## Key Findings & Validation
+- **WSL Log Ingestion:** Enabled and verified `rsyslog` so `Fail2Ban` reliably polls `/var/log/auth.log` rather than relying solely on direct journal queries.
+- **Filter & Enforcement Testing:** Validated `sshd` filter regex matching against authentication logs with `fail2ban-regex`, and confirmed active jail enforcement using `fail2ban-client` (`banip` and `unbanip`).
+- **Loopback (`ignoreip`) Precedence:** Confirmed that `[DEFAULT]` `ignoreip = 127.0.0.1/8 ::1` prevents automated bans on loopback traffic even when testing against `127.0.0.1`, and preserved loopback exclusions to avoid locking out local access.
+
+## Quick Status Checks
+
+    sudo ufw status
+    sudo service rsyslog status
+    sudo fail2ban-client status sshd
+
