@@ -33,3 +33,11 @@ A modular Blue Team and detection engineering lab built on Kali Linux under WSL 
     sudo service rsyslog status
     sudo fail2ban-client status sshd
 
+
+## Findings
+- Hydra generated 6 failed SSH attempts from 127.0.0.1 (MITRE ATT&CK T1110).
+- Fail2Ban ban/unban verified using test IP 192.0.2.50.
+- Health check: all 6 checks PASS (UFW, rsyslog, auth.log, sshd jail, ignoreip).
+
+![Health check](screenshots/health-check-pass.png)
+![Log summary](screenshots/log-summary-output.png)
