@@ -1,43 +1,62 @@
 # Mini-SOC / IDS Lab (Kali Linux WSL - WARMACHINE)
 
-A modular Blue Team and detection engineering lab built on Kali Linux under WSL to practice host firewalling, authentication log ingestion, intrusion prevention validation, and clear security documentation for portfolio development.
+A small Blue Team lab built on Kali Linux under WSL to practice host firewalling, authentication log analysis, intrusion prevention validation, and clear security documentation.
+
+> Authorized home-lab use only. All attack simulation targets my own loopback interface.
 
 ## What This Lab Demonstrates
-- **Host Firewalling:** Enforcing default incoming deny rules using `UFW` on a Kali Linux WSL environment (`WARMACHINE`).
-- **WSL Log Ingestion:** Running `rsyslog` so authentication events are reliably written to `/var/log/auth.log` for `Fail2Ban` `polling` mode.
-- **Detection & Enforcement:** Validating `sshd` filter rules via `fail2ban-regex` and verifying active jail actions (`banip` / `unbanip`) with `fail2ban-client`.
-- **Loopback (`ignoreip`) Precedence:** Documenting how `[DEFAULT]` `ignoreip = 127.0.0.1/8 ::1` prevents loopback auto-bans during local `Hydra` tests while keeping loopback exclusions intact to protect host access.
+- **Host firewalling:** UFW with default deny incoming, SSH allowed.
+- **Log ingestion:** rsyslog writing SSH authentication events to `/var/log/auth.log`.
+- **Detection and enforcement:** Fail2Ban `sshd` jail (`backend = polling`), filter validated with `fail2ban-regex`, ban/unban verified with `fail2ban-client`.
+- **Safe testing:** loopback kept in `ignoreip` by default, temporarily removed only to prove a live ban, then restored.
+- **Automation:** scripts that check lab health (PASS/FAIL) and summarize attacks.
 
-## Architecture & Stack
-- **Environment:** `WARMACHINE` (Kali Linux on WSL)
-- **Host Firewall:** `UFW` (default incoming deny)
-- **Intrusion Prevention:** `Fail2Ban` (`sshd` jail using `backend = polling` and `/var/log/auth.log`)
-- **Log Ingestion:** `rsyslog` (forwarding authentication events to `/var/log/auth.log`)
-- **Simulated Attack Testing:** `Hydra` (controlled local SSH authentication attempts)
+## Architecture
+- **Environment:** WARMACHINE (Kali Linux on WSL)
+- **Firewall:** UFW (default deny incoming)
+- **IPS:** Fail2Ban (`sshd` jail, `/var/log/auth.log`)
+- **Log ingestion:** rsyslog
+- **Attack simulation:** Hydra against 127.0.0.1 (lab only)
+
+## Prerequisites
+    sudo apt update
+    sudo apt install -y ufw fail2ban rsyslog openssh-server hydra nmap shellcheck
 
 ## Repository Structure
-- `configs/` — Reference configuration snapshots (`sshd-wsl.local`)
-- `docs/` — Lab planning notes, detection findings, and architecture documentation (`lab-plan.md`)
-- `scripts/` — Automation and security posture scripts (`health-check.sh`, `log-summary.sh`, `recon_check.sh`)
-- `screenshots/` — Visual evidence from lab runs
+- `configs/` - reference configuration snapshots (`sshd-wsl.local`)
+- `docs/` - lab plan, roadmap, and notes (`lab-plan.md`)
+- `scripts/` - `health-check.sh`, `log-summary.sh`, `recon-check.sh`
+- `screenshots/` - evidence from lab runs
 
-## Running the Lab Scripts
-
-    ./scripts/health-check.sh
-    ./scripts/log-summary.sh
-    ./scripts/recon-check.sh 127.0.0.1 22
+## Running the Scripts
+    ./scripts/health-check.sh              # PASS/FAIL checks, exit code 0 = healthy
+    ./scripts/log-summary.sh               # failed attempts, top IPs, usernames, Ban/Unban events
+    ./scripts/recon-check.sh 127.0.0.1 22  # open ports vs expected policy
 
 ## Quick Status Checks
-
-    sudo ufw status
+    sudo ufw status verbose
     sudo service rsyslog status
     sudo fail2ban-client status sshd
 
-
 ## Findings
-- Hydra generated 6 failed SSH attempts from 127.0.0.1 (MITRE ATT&CK T1110).
-- Fail2Ban ban/unban verified using test IP 192.0.2.50.
-- Health check: all 6 checks PASS (UFW, rsyslog, auth.log, sshd jail, ignoreip).
+- Hydra generated 6 failed SSH attempts from 127.0.0.1 (MITRE ATT&CK T1110 - Brute Force).
+- Fail2Ban ban/unban verified using documentation test IP 192.0.2.50.
+- Health check: all 6 checks PASS (UFW active, default deny, rsyslog, auth.log, sshd jail, loopback in effective ignoreip).
 
 ![Health check](screenshots/health-check-pass.png)
 ![Log summary](screenshots/log-summary-output.png)
+
+## Script Design Notes
+- `log-summary.sh` excludes `sudo` self-logging lines so its own commands are not counted as attacks.
+- Ban events are read from `/var/log/fail2ban.log`, not `auth.log`.
+- `health-check.sh` returns a non-zero exit code on any failed check, so it can be used in automation.
+
+## Limitations
+- WSL is not a production server; firewall and ban enforcement may behave differently on bare metal.
+- Testing is limited to loopback; no external attacker host yet.
+- Detection is log-based (Fail2Ban) only.
+
+## Roadmap
+- Ubuntu Server target with a separate attacker host
+- Wazuh and Suricata integration
+- Evidence of ban rules in iptables/nftables
