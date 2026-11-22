@@ -1,14 +1,13 @@
-# Mini-SOC Lab Final Report (WARMACHINE)
+# Mini-SOC Lab Report — WARMACHINE (Kali Linux WSL)
 
 ## Executive Summary
-A modular Blue Team and detection engineering lab (`mini-soc-lab`) was deployed and validated on Kali Linux under WSL (`WARMACHINE`), combining `UFW` host firewalling, `rsyslog` log collection, `Fail2Ban` intrusion prevention (`polling` backend), and automated shell scripts for health and log analysis.
+This report documents the local Blue Team / Mini-SOC lab built on **Kali Linux WSL (`WARMACHINE`)** over **Windows 11**, covering UFW firewall policy, `rsyslog` authentication logging, Fail2Ban `sshd` jail validation, and Bash automation scripts (`health-check.sh`, `log-summary.sh`, `recon-check.sh`).
 
-## Key Technical Outcomes
-- **Firewall & Service Hardening:** Configured `UFW` with default incoming deny and verified SSH access.
-- **Reliable Log Pipeline:** Enabled `rsyslog` to populate `/var/log/auth.log` for `Fail2Ban` polling.
-- **Detection & Response:** Validated `sshd` filter rules, tested ban/unban workflows, and documented `[DEFAULT]` `ignoreip` behavior for loopback safety.
-- **Automation & Portfolio Readiness:** Built `health-check.sh`, `log-summary.sh`, and `recon-check.sh`, and organized documentation and configuration snapshots in Git.
+## Implemented vs. Future Work
+- **Implemented:** UFW policy setup, `rsyslog` log collection (`/var/log/auth.log`), Fail2Ban `sshd` jail (`polling` backend) with `192.0.2.50` Ban/Unban log verification, Hydra failed-SSH simulation against `127.0.0.1`, and Bash health/log/recon scripts.
+- **Future Work:** Dedicated Ubuntu Server target and separate attacker host, Wazuh SIEM, Suricata IDS, centralized log collection, and dashboards.
 
-## Next Steps
-- Add visual evidence (`screenshots/health-check-pass.png`, `screenshots/log-summary-output.png`, `screenshots/firewall-status.png`) as captured.
-- Expand into external test hosts, `Suricata`, `Wazuh`, and `iptables`/`nftables` rule verification.
+## Key Outcomes & Honest Caveats
+- `log-summary.sh` was updated to deduplicate failed SSH attempt entries, avoid counting `sudo` lines, and extract IPv4/IPv6 source addresses cleanly without misclassifying `HH:MM:SS` timestamps.
+- `recon-check.sh` normalizes and sorts port lists before comparing against expected policy.
+- Screenshots reflect exact point-in-time WSL states (including `Status: inactive` in `screenshots/firewall-status.png` when UFW was not active at capture time).

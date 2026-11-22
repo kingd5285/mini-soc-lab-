@@ -1,26 +1,14 @@
-# Lab Plan & Scope
-- Attacker: Kali Linux (WSL / WARMACHINE)
-- Target & SOC Components: Ubuntu Server, Wazuh / Suricata, UFW, Fail2Ban
-- Rules of Engagement: Authorized home lab environment only.
-- Firewall (UFW): Active (22/tcp OpenSSH allowed, default incoming deny)
-- Intrusion Prevention (Fail2Ban): Active with sshd jail enabled
+# Lab Plan (WARMACHINE - Kali Linux WSL)
 
-## Step 2: SSH Service, UFW & Fail2Ban Hardening
-- Target: Localhost (127.0.0.1) on WARMACHINE (Kali WSL)
-- SSH: OpenSSH server enabled on port 22/tcp
-- UFW: Active with OpenSSH allowed and default incoming traffic denied
-- Fail2Ban: Active with sshd jail enabled
-- Validation: Verified journald fields (SYSLOG_IDENTIFIER=sshd, _COMM=sshd, _SYSTEMD_UNIT=ssh.service) and tested Fail2Ban detection against SSH login attempts on 127.0.0.1.
-- Session Wrap-up: Confirmed rsyslog active, verified 127.0.0.1/8 in default Fail2Ban ignoreip, and validated sshd jail ban/unban actions using test IP 192.0.2.50 on WARMACHINE.
-- Live Ban Verification: Temporarily excluded 127.0.0.1 from ignoreip with bantime=60 and maxretry=2; confirmed Hydra triggered automated ban on 127.0.0.1, then restored 127.0.0.1/8 to ignoreip.
-- Loopback Architecture Note: Default [DEFAULT] ignoreip=127.0.0.1/8 supersedes jail-level ignoreip overrides; validated detection via fail2ban-regex and enforcement via fail2ban-client banip/unbanip while preserving safe loopback defaults.
+## Objective
+Build and document a reproducible local Blue Team / Mini-SOC lab on **Kali Linux WSL (`WARMACHINE`)** under **Windows 11**, focusing on host firewall policy, SSH authentication log analysis, Fail2Ban validation, and honest evidence reporting.
 
-## Roadmap (Planned, not yet implemented)
-- Ubuntu Server target
-- Wazuh / Suricata integration
+## Scope & Boundaries
+- **Target:** Local SSH service (`127.0.0.1`, port `22`)
+- **Network scope:** Loopback interface (`127.0.0.1`) only
+- **Out of scope (Future Work):** Ubuntu Server target, external attacker host, Wazuh SIEM, Suricata IDS, centralized log shipping, and dashboards.
 
-## MITRE ATT&CK Mapping
-- T1110 Brute Force (SSH, tested with Hydra on loopback)
-
-## Limitations
-- WSL is not a production server; ban enforcement may differ from bare metal.
+## Key Configuration & Verification Notes
+- **Firewall (`UFW`):** Default incoming policy set to `deny`, SSH (`22/tcp`) permitted, and status checked via `ufw status verbose`.
+- **Logging (`rsyslog`):** Writes SSH authentication events to `/var/log/auth.log` for inspection and parsing by `scripts/log-summary.sh`.
+- **Fail2Ban (`sshd` jail):** Configured with `backend = polling` on WSL; `Ban` and `Unban` actions were tested using `192.0.2.50` without making unverified claims about `ignoreip` precedence rules.

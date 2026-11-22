@@ -1,18 +1,12 @@
 # Lab Limitations & Environment Scope
 
-## Current Environment Scope
+## Current Environment
 - **Host OS:** Windows 11
 - **Linux Environment:** Kali Linux WSL (`WARMACHINE`)
-- **Target & Scope:** Local SSH service on loopback (`127.0.0.1`, port `22`) only
-- **Implemented Stack:** UFW, `rsyslog` (`/var/log/auth.log`), Fail2Ban (`sshd` jail), and Bash verification/analysis scripts (`health-check.sh`, `log-summary.sh`, `recon-check.sh`).
+- **Scope:** Localhost (`127.0.0.1`) SSH service only
 
-## WSL & Lab Limitations
-- **Not a production or bare-metal server:** WSL service management, networking, and firewall/ban enforcement can differ from a standalone Ubuntu Server or bare-metal Linux host.
-- **Service persistence across sessions:** Services such as `rsyslog`, `fail2ban`, and `ufw` may not remain running automatically across WSL restarts unless started in the session, affecting point-in-time `health-check.sh` and `ufw status` outputs.
-- **Loopback-only testing:** Attack simulation (such as Hydra brute-force testing) is restricted to `127.0.0.1`; external network hosts and multi-host traffic are out of scope for the current implementation.
-- **Log-based detection only:** Current detection relies on host authentication and Fail2Ban logs rather than network packet inspection or centralized SIEM correlation.
-
-## Future Work (Not Yet Implemented)
-- Dedicated Ubuntu Server target and separate attacker host
-- Wazuh SIEM deployment and centralized log collection/dashboards
-- Suricata IDS deployment and rule-based network detection
+## Limitations
+- **WSL service and network behavior:** Services (`ufw`, `rsyslog`, `fail2ban`) may not persist automatically across WSL restarts and can behave differently from bare-metal Linux or a dedicated Ubuntu Server.
+- **Loopback-only testing:** Simulation is limited to `127.0.0.1`; external attacker hosts and multi-host traffic are not part of the current implementation.
+- **No direct Hydra live-ban proof:** Ban/unban verification in logs was performed with `192.0.2.50`, so an automatic live ban triggered by Hydra is not claimed as verified.
+- **Host log-only detection:** No Wazuh SIEM, Suricata IDS, or centralized log pipeline is deployed yet.

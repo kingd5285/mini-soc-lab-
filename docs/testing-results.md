@@ -1,21 +1,20 @@
 # Testing Results & Evidence (WARMACHINE - Kali Linux WSL)
 
-All tests were executed in an authorized home-lab environment on **Kali Linux WSL (`WARMACHINE`)** running on a **Windows 11** host, targeting local SSH (`127.0.0.1`, port `22`) within loopback scope only.
+All tests were conducted on **Kali Linux WSL (`WARMACHINE`)** running on **Windows 11**, targeting local SSH (`127.0.0.1`, port `22`) within loopback scope only.
 
-## Summary Results Table
+## Detailed Results & Evidence
 
-| Test | Expected Result | Actual Result | Status | Evidence |
+| Test | Command / Check | Expected Result | Actual Result & Evidence Notes | Status |
 | :--- | :--- | :--- | :--- | :--- |
-| UFW status | Active | Active (when UFW is enabled) | PASS | `sudo ufw status verbose` & `screenshots/firewall-status.png` |
-| Default incoming | Deny | Deny (when UFW is enabled) | PASS | `sudo ufw status verbose` & `screenshots/firewall-status.png` |
-| rsyslog | Running | Running (when rsyslog service is started) | PASS | `sudo service rsyslog status` & `./scripts/health-check.sh` |
-| SSH jail | Active | Active (when Fail2Ban is started) | PASS | `sudo fail2ban-client status sshd` & `./scripts/health-check.sh` |
-| Authentication logs | Available | Available (`/var/log/auth.log` present with entries) | PASS | `./scripts/health-check.sh` & `screenshots/health-check-pass.png` |
-| Health check | All checks pass | 6 checks passed (when services are active) | PASS | `./scripts/health-check.sh` & `screenshots/health-check-pass.png` |
-| SSH brute-force & log summary | Failed attempts, top IP/user, Ban/Unban shown | 6 failed SSH attempts from `127.0.0.1` (`invaliduser`) + Ban/Unban events (`192.0.2.50`) | PASS | `./scripts/log-summary.sh` & `screenshots/log-summary-output.png` |
-| Port policy check | Open ports match expected policy | Normalized port set matches expected policy (`22`) | PASS | `./scripts/recon-check.sh 127.0.0.1 22` |
+| UFW status | `sudo ufw status verbose` | `Status: active` when enabled | `screenshots/firewall-status.png` shows `Status: inactive` at capture time; UFW is `active` when started | VERIFIED IN CAPTURE (`inactive`) / PASS WHEN ENABLED |
+| Default incoming | `sudo ufw status verbose` | `Default: deny (incoming)` when active | Matches policy when UFW is active | PASS (when active) |
+| rsyslog | `sudo service rsyslog status` | Service running | Running when started in WSL session | PASS (when running) |
+| Fail2Ban `sshd` jail | `sudo fail2ban-client status sshd` | Jail active | Active when Fail2Ban service is started in WSL session | PASS (when running) |
+| Auth log availability | `./scripts/health-check.sh` | `/var/log/auth.log` exists and has data | Confirmed in `screenshots/health-check-pass.png` | PASS |
+| SSH brute-force simulation | Hydra against `127.0.0.1` + `./scripts/log-summary.sh` | Failed SSH attempts recorded without double-counting | Deduplicated attempt summary and target usernames reported; direct Hydra live-ban is not claimed as verified evidence | PASS (attempt logging) |
+| Fail2Ban Ban/Unban event | `./scripts/log-summary.sh` (`/var/log/fail2ban.log`) | `Ban` / `Unban` entries visible | `Ban` and `Unban` events for `192.0.2.50` observed in Fail2Ban log | PASS (test IP `192.0.2.50`) |
+| Port policy check | `./scripts/recon-check.sh 127.0.0.1 22` | Normalized open ports match expected (`22`) | Normalized port comparison prevents formatting/order false fails | PASS |
 
-## Important Note on Service State & Screenshots
-- Service states (`UFW`, `rsyslog`, and Fail2Ban `sshd` jail) depend on whether services have been started during the current WSL session.
-- If a service is stopped or inactive at capture time, `health-check.sh` and `ufw status verbose` will report `inactive` / `not running` / `FAIL`—which is expected behavior rather than a script bug.
-- Always start required services (`ufw`, `rsyslog`, `fail2ban`) before capturing `PASS` posture screenshots.
+## Evidence Integrity Rules
+- Captures must never be misrepresented: if a screenshot shows a stopped or inactive service (`inactive`, `not running`, `not active`), documentation states that exact state rather than labeling it `PASS` blindly.
+- Re-capture screenshots after starting required services (`ufw`, `rsyslog`, `fail2ban`) and re-running scripts when updated `PASS` evidence is needed.
