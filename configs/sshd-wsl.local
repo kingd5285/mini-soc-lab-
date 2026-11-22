@@ -2,6 +2,7 @@
 enabled = true
 backend = polling
 logpath = /var/log/auth.log
+ignoreip = 127.0.0.1/8 ::1
 maxretry = 2
 findtime = 600
 bantime = 600

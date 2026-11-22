@@ -13,3 +13,4 @@
 - Fail2Ban: Active with sshd jail enabled
 - Validation: Verified journald fields (SYSLOG_IDENTIFIER=sshd, _COMM=sshd, _SYSTEMD_UNIT=ssh.service) and tested Fail2Ban detection against SSH login attempts on 127.0.0.1.
 - Session Wrap-up: Confirmed rsyslog active, verified 127.0.0.1/8 in default Fail2Ban ignoreip, and validated sshd jail ban/unban actions using test IP 192.0.2.50 on WARMACHINE.
+- Live Ban Verification: Temporarily excluded 127.0.0.1 from ignoreip with bantime=60 and maxretry=2; confirmed Hydra triggered automated ban on 127.0.0.1, then restored 127.0.0.1/8 to ignoreip.
