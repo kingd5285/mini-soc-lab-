@@ -21,6 +21,21 @@ A small Blue Team lab built on Kali Linux under WSL to practice host firewalling
 - **IPS:** Fail2Ban (`sshd` jail, `backend = polling`, monitoring `/var/log/auth.log`)
 - **Attack simulation:** Hydra against `127.0.0.1` (lab only)
 
+## Implemented
+- **UFW:** Host firewall configured with default incoming deny and SSH allowed.
+- **rsyslog:** Log ingestion forwarding authentication events to `/var/log/auth.log`.
+- **Fail2Ban:** Intrusion prevention (`sshd` jail, `polling` backend) with filter and ban/unban validation.
+- **SSH monitoring:** Monitoring local SSH authentication attempts and simulated brute-force activity (`MITRE ATT&CK T1110`).
+- **Bash health checks:** Automated posture checks via `./scripts/health-check.sh` and port checks via `./scripts/recon-check.sh`.
+- **Log analysis:** Automated parsing of authentication and Fail2Ban events via `./scripts/log-summary.sh`.
+
+## Future Work
+- **Ubuntu Server target:** Separate server host beyond WSL loopback testing.
+- **Wazuh SIEM:** Host security monitoring and centralized alert correlation *(not yet deployed in this lab)*.
+- **Suricata IDS:** Network intrusion detection and packet-level alert rules *(not yet deployed in this lab)*.
+- **Centralized log collection:** Forwarding logs from multiple hosts to a central collector.
+- **Dashboard:** Visual SOC/SIEM interface for monitoring alerts and trends.
+
 ## Prerequisites
 
     sudo apt update
@@ -63,8 +78,3 @@ A small Blue Team lab built on Kali Linux under WSL to practice host firewalling
 - WSL is not a production server; firewall and ban enforcement may behave differently on bare metal.
 - Testing is limited to loopback; no external attacker host yet.
 - Detection is log-based (Fail2Ban) only.
-
-## Roadmap
-- Ubuntu Server target with a separate attacker host
-- Wazuh and Suricata integration
-- Evidence of ban rules in iptables/nftables
